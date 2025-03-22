@@ -13,6 +13,6 @@ class CounterCubit extends Cubit<CounterState> {
   }
 
   void reset() {
-    emit(state.copyWith(counter: 0));
+    emit(state.copyWith(counter: 0, transactionCount: 0));
   }
 }

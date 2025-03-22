@@ -17,15 +17,24 @@ class CubitCounterScreen extends StatelessWidget {
 class _CubitCounterView extends StatelessWidget {
   const _CubitCounterView();
 
+  // Esta es otra forma de incrementar el contador usando el contexto
+  void _incrementCounter(BuildContext context, [int value = 1]) {
+    context.read<CounterCubit>().incrementBy(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final counterState = context.watch<CounterCubit>().state;
+    final counterCubit = context.read<CounterCubit>();
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Cubit Counter: ${counterState.transactionCount}'),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => counterCubit.reset(),
+          ),
         ],
       ),
 
@@ -34,7 +43,7 @@ class _CubitCounterView extends StatelessWidget {
         child: BlocBuilder<CounterCubit, CounterState>(
           // buildWhen: Solo se ejecuta cuando el estado actual es diferente al anterior (optimización)
           // buildWhen: (previous, current) => previous.counter != current.counter,
-          builder: (context, state) => Text('Cubit Counter ${state.counter}'),
+          builder: (context, state) => Text('Cubit Counter: ${state.counter}'),
         ),
       ),
 
@@ -42,11 +51,28 @@ class _CubitCounterView extends StatelessWidget {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton(heroTag: 'btn-1', child: const Text('+3'), onPressed: () {}),
+          /// +3
+          FloatingActionButton(
+            heroTag: 'btn-1',
+            child: const Text('+3'),
+            onPressed: () => context.read<CounterCubit>().incrementBy(3), // Usando context.read
+          ),
           const SizedBox(height: 8),
-          FloatingActionButton(heroTag: 'btn-2', child: const Text('+2'), onPressed: () {}),
+
+          /// +2
+          FloatingActionButton(
+            heroTag: 'btn-2',
+            child: const Text('+2'),
+            onPressed: () => counterCubit.incrementBy(2), // Usando counterCubit
+          ),
           const SizedBox(height: 8),
-          FloatingActionButton(heroTag: 'btn-3', child: const Text('+1'), onPressed: () {}),
+
+          /// +1
+          FloatingActionButton(
+            heroTag: 'btn-3',
+            child: const Text('+1'),
+            onPressed: () => _incrementCounter(context), // Usando _incrementCounter
+          ),
           const SizedBox(height: 8),
         ],
       ),
