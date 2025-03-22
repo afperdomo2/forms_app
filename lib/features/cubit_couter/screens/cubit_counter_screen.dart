@@ -24,12 +24,15 @@ class _CubitCounterView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final counterState = context.watch<CounterCubit>().state;
+    // final counterState = context.watch<CounterCubit>().state;
     final counterCubit = context.read<CounterCubit>();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cubit Counter: ${counterState.transactionCount}'),
+        // title: Text('Cubit Counter: ${counterState.transactionCount}'),
+        title: context.select(
+          (CounterCubit cubit) => Text('Cubit Counter: ${cubit.state.transactionCount}'),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -43,7 +46,9 @@ class _CubitCounterView extends StatelessWidget {
         child: BlocBuilder<CounterCubit, CounterState>(
           // buildWhen: Solo se ejecuta cuando el estado actual es diferente al anterior (optimización)
           // buildWhen: (previous, current) => previous.counter != current.counter,
-          builder: (context, state) => Text('Cubit Counter: ${state.counter}'),
+          builder: (context, state) {
+            return Text('Cubit Counter: ${state.counter}');
+          },
         ),
       ),
 
