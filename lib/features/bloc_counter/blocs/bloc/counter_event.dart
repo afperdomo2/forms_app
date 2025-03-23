@@ -9,3 +9,5 @@ class CounterIncremented extends CounterEvent {
 
   const CounterIncremented(this.value);
 }
+
+class CounterReset extends CounterEvent {}

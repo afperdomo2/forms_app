@@ -9,6 +9,7 @@ part 'counter_state.dart';
 class CounterBloc extends Bloc<CounterEvent, CounterState> {
   CounterBloc() : super(const CounterInitial()) {
     on<CounterIncremented>(_onCounterIncreadsed);
+    on<CounterReset>(_onCounterReset);
   }
 
   FutureOr<void> _onCounterIncreadsed(CounterIncremented event, Emitter<CounterState> emit) {
@@ -16,5 +17,9 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
       counter: (state.counter + event.value).toInt(),
       transactionCount: state.transactionCount + 1,
     ));
+  }
+
+  FutureOr<void> _onCounterReset(CounterReset event, Emitter<CounterState> emit) {
+    emit(const CounterInitial());
   }
 }
