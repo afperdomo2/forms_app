@@ -4,8 +4,8 @@ sealed class CounterEvent {
   const CounterEvent();
 }
 
-class IncrementCounter extends CounterEvent {
+class CounterIncremented extends CounterEvent {
   final int value;
 
-  const IncrementCounter(this.value);
+  const CounterIncremented(this.value);
 }
