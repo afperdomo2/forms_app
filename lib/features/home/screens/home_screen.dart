@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
             onTap: () => context.push('/cubit-counter'),
           ),
           ListTile(
-            title: const Text('Bloc'),
+            title: const Text('BLoC'),
             subtitle: const Text('BLoC (Business Logic Component)'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () => context.push('/bloc-counter'),
