@@ -53,7 +53,7 @@ class _BlocCounterView extends StatelessWidget {
           FloatingActionButton(
             heroTag: 'btn-1',
             child: const Text('+3'),
-            onPressed: () => _incrementCounterBy(context, 3),
+            onPressed: () => _incrementCounterBy(context, 3), // Usa el método
           ),
           const SizedBox(height: 8),
 
@@ -61,7 +61,7 @@ class _BlocCounterView extends StatelessWidget {
           FloatingActionButton(
             heroTag: 'btn-2',
             child: const Text('+2'),
-            onPressed: () => _incrementCounterBy(context, 2),
+            onPressed: () => counterBloc.add(const CounterIncremented(2)), // Usa el evento
           ),
           const SizedBox(height: 8),
 
@@ -69,7 +69,7 @@ class _BlocCounterView extends StatelessWidget {
           FloatingActionButton(
             heroTag: 'btn-3',
             child: const Text('+1'),
-            onPressed: () => _incrementCounterBy(context, 1),
+            onPressed: () => counterBloc.increaseBy(), // Usa el método del Bloc
           ),
           const SizedBox(height: 8),
         ],

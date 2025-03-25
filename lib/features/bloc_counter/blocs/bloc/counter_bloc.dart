@@ -22,4 +22,14 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
   FutureOr<void> _onCounterReset(CounterReset event, Emitter<CounterState> emit) {
     emit(const CounterInitial());
   }
+
+  /// (Opcional) Estos son otra forma de usar los eventos y es creando
+  /// métodos que emiten los eventos
+  void increaseBy([int value = 1]) {
+    add(CounterIncremented(value));
+  }
+
+  void reset() {
+    add(CounterReset());
+  }
 }
