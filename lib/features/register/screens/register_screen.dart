@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forms_app/shared/validators/form_validators.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -34,87 +35,64 @@ class _RegisterForm extends StatelessWidget {
   _RegisterForm();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formKey, // Asignamos la clave al formulario
+      key: formKey,
       child: Column(
         children: [
           /// Nombre
-          CustomTextFormField(
+          const RectangleTextFormField(
             label: 'Nombre',
             hint: 'Ingrese su nombre',
             textInputAction: TextInputAction.next,
             textCapitalization: TextCapitalization.words,
             prefixIcon: Icons.person_outline,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Este campo es requerido';
-              }
-              return null;
-            },
+            validator: FormValidators.isRequired,
           ),
           const SizedBox(height: 10),
 
-          CustomTextFormField(
+          const RectangleTextFormField(
             label: 'Apellido',
             hint: 'Ingrese su apellido',
             textInputAction: TextInputAction.next,
             textCapitalization: TextCapitalization.words,
             prefixIcon: Icons.person_outline,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Este campo es requerido';
-              }
-              return null;
-            },
+            validator: FormValidators.isRequired,
           ),
           const SizedBox(height: 10),
 
           /// Correo
-          CustomTextFormField(
+          const RectangleTextFormField(
             label: 'Correo',
             hint: 'Ingrese su correo',
             textInputAction: TextInputAction.next,
             prefixIcon: Icons.email_outlined,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Este campo es requerido';
-              }
-              return null;
-            },
+            validator: FormValidators.isValidEmail,
           ),
           const SizedBox(height: 10),
 
           /// Contraseña
-          CustomTextFormField(
+          RectangleTextFormField(
             label: 'Contraseña',
             hint: 'Ingrese su contraseña',
             textInputAction: TextInputAction.next,
             prefixIcon: Icons.lock_outline,
             obscureText: true,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Este campo es requerido';
-              }
-              return null;
-            },
+            controller: passwordController,
+            validator: FormValidators.isValidPassword,
           ),
           const SizedBox(height: 10),
 
           /// Confirmar contraseña
-          CustomTextFormField(
+          RectangleTextFormField(
             label: 'Confirmar contraseña',
             hint: 'Confirme su contraseña',
             prefixIcon: Icons.lock_outline,
             obscureText: true,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Este campo es requerido';
-              }
-              return null;
-            },
+            validator: (value) => FormValidators.confirmPassword(value, passwordController.text),
           ),
           const SizedBox(height: 20),
 
@@ -122,26 +100,20 @@ class _RegisterForm extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
+              RectangleFilledButton(
+                icon: Icons.save,
+                text: 'Registrar',
                 flex: 60,
-                child: FilledButton.icon(
-                  onPressed: () => _onSubmit(context),
-                  icon: const Icon(Icons.person_add),
-                  label: const Text('Registrar'),
-                ),
+                onPressed: () => _onSubmit(context),
               ),
               const SizedBox(width: 10),
-              Expanded(
+              RectangleFilledButton(
+                icon: Icons.cleaning_services_outlined,
+                text: 'Limpiar',
                 flex: 40,
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.grey.shade200,
-                    foregroundColor: Colors.black87,
-                  ),
-                  onPressed: () => formKey.currentState?.reset(),
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Limpiar'),
-                ),
+                onPressed: () => formKey.currentState?.reset(),
+                backgroundColor: Colors.grey.shade200,
+                foregroundColor: Colors.black87,
               ),
             ],
           ),
@@ -160,7 +132,43 @@ class _RegisterForm extends StatelessWidget {
   }
 }
 
-class CustomTextFormField extends StatelessWidget {
+class RectangleFilledButton extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final VoidCallback onPressed;
+  final int flex;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+
+  const RectangleFilledButton({
+    super.key,
+    required this.icon,
+    required this.text,
+    required this.onPressed,
+    this.flex = 1,
+    this.backgroundColor,
+    this.foregroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: flex,
+      child: FilledButton.icon(
+        style: FilledButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: foregroundColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        onPressed: onPressed,
+        icon: Icon(icon),
+        label: Text(text),
+      ),
+    );
+  }
+}
+
+class RectangleTextFormField extends StatelessWidget {
   final String? label;
   final String? hint;
   final String? errorMessage;
@@ -173,9 +181,10 @@ class CustomTextFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool isDense;
   final IconData? prefixIcon;
-  final bool obscureText; // New parameter for password fields
+  final bool obscureText;
+  final TextEditingController? controller; // Añadimos controller
 
-  const CustomTextFormField({
+  const RectangleTextFormField({
     super.key,
     this.label,
     this.hint,
@@ -184,12 +193,13 @@ class CustomTextFormField extends StatelessWidget {
     this.textInputAction = TextInputAction.next,
     this.textCapitalization = TextCapitalization.none,
     this.autofocus = false,
-    this.autocorrect = true, // Sirve para corregir errores de escritura
+    this.autocorrect = true,
     this.onChanged,
     this.validator,
     this.isDense = true,
     this.prefixIcon,
-    this.obscureText = false, // Agrega el parámetro para campos de contraseña
+    this.obscureText = false,
+    this.controller,
   });
 
   @override
@@ -197,6 +207,7 @@ class CustomTextFormField extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return TextFormField(
+      controller: controller, // Agregamos el controller
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -221,7 +232,7 @@ class CustomTextFormField extends StatelessWidget {
         ),
       ),
 
-      obscureText: obscureText, // Add obscureText property
+      obscureText: obscureText,
       validator: validator,
       textInputAction: textInputAction,
       autofocus: autofocus,
