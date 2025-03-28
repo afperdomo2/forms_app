@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:forms_app/shared/validators/form_validators.dart';
 import 'package:forms_app/shared/widgets/buttons/rectangle_filled_button.dart';
 import 'package:forms_app/shared/widgets/inputs/rectangle_text_form_field.dart';
 
@@ -14,15 +13,15 @@ class RegisterScreen extends StatelessWidget {
       ),
 
       /// Body
-      body: SafeArea(
+      body: const SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const FlutterLogo(size: 80),
-                const SizedBox(height: 10),
+                FlutterLogo(size: 80),
+                SizedBox(height: 10),
                 _RegisterForm(),
               ],
             ),
@@ -33,43 +32,62 @@ class RegisterScreen extends StatelessWidget {
   }
 }
 
-class _RegisterForm extends StatelessWidget {
-  _RegisterForm();
+class _RegisterForm extends StatefulWidget {
+  const _RegisterForm();
 
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  @override
+  State<_RegisterForm> createState() => __RegisterFormState();
+}
+
+class __RegisterFormState extends State<_RegisterForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final passwordController = TextEditingController();
+
+  String username = '';
+  String email = '';
+  String password = '';
+  String confirmPassword = '';
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formKey,
+      key: _formKey,
       child: Column(
         children: [
           /// Nombre
-          const RectangleTextFormField(
-            label: 'Nombre',
-            hint: 'Ingrese su nombre',
+          RectangleTextFormField(
+            label: 'Usuario',
+            hint: 'Ingrese su nombre de usuario',
             prefixIcon: Icons.person_outline,
             textCapitalization: TextCapitalization.words, // Capitalizar palabras
-            validator: FormValidators.isRequired,
-          ),
-          const SizedBox(height: 10),
-
-          const RectangleTextFormField(
-            label: 'Apellido',
-            hint: 'Ingrese su apellido',
-            prefixIcon: Icons.person_outline,
-            textCapitalization: TextCapitalization.words, // Capitalizar palabras
-            validator: FormValidators.isRequired,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Este campo es requerido';
+              }
+              if (value.length < 3) {
+                return 'El nombre de usuario debe tener al menos 3 caracteres';
+              }
+              return null;
+            },
+            onChanged: (value) => username = value,
           ),
           const SizedBox(height: 10),
 
           /// Correo
-          const RectangleTextFormField(
+          RectangleTextFormField(
             label: 'Correo',
             hint: 'Ingrese su correo',
             prefixIcon: Icons.email_outlined,
-            validator: FormValidators.isValidEmail,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Este campo es requerido';
+              }
+              if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
+                return 'Ingrese un correo electrónico válido';
+              }
+              return null;
+            },
+            onChanged: (value) => email = value,
           ),
           const SizedBox(height: 10),
 
@@ -79,21 +97,18 @@ class _RegisterForm extends StatelessWidget {
             hint: 'Ingrese su contraseña',
             prefixIcon: Icons.lock_outline,
             obscureText: true,
-            controller: passwordController,
-            validator: FormValidators.isValidPassword,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Este campo es requerido';
+              }
+              if (value.length < 6) {
+                return 'La contraseña debe tener al menos 6 caracteres';
+              }
+              return null;
+            },
+            onChanged: (value) => password = value,
           ),
           const SizedBox(height: 10),
-
-          /// Confirmar contraseña
-          RectangleTextFormField(
-            label: 'Confirmar contraseña',
-            hint: 'Confirme su contraseña',
-            prefixIcon: Icons.lock_outline,
-            textInputAction: TextInputAction.done, // Cambiamos a done
-            obscureText: true,
-            validator: (value) => FormValidators.confirmPassword(value, passwordController.text),
-          ),
-          const SizedBox(height: 20),
 
           // Buttons row
           Row(
@@ -110,7 +125,7 @@ class _RegisterForm extends StatelessWidget {
                 icon: Icons.cleaning_services_outlined,
                 text: 'Limpiar',
                 flex: 40,
-                onPressed: () => formKey.currentState?.reset(),
+                onPressed: () => _formKey.currentState?.reset(),
                 backgroundColor: Colors.grey.shade200,
                 foregroundColor: Colors.black87,
               ),
@@ -122,11 +137,14 @@ class _RegisterForm extends StatelessWidget {
   }
 
   _onSubmit(BuildContext context) {
-    final isValid = formKey.currentState!.validate();
+    final isValid = _formKey.currentState!.validate();
     if (isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Usuario registrado')),
       );
+      print('Usuario: $username');
+      print('Correo: $email');
+      print('Contraseña: $password');
     }
   }
 }
