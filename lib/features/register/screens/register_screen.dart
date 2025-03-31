@@ -46,7 +46,6 @@ class __RegisterFormState extends State<_RegisterForm> {
   String username = '';
   String email = '';
   String password = '';
-  String confirmPassword = '';
 
   @override
   Widget build(BuildContext context) {
