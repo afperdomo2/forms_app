@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:form_validator/form_validator.dart';
 import 'package:forms_app/features/register/cubits/cubit/register_cubit.dart';
 import 'package:forms_app/shared/widgets/buttons/rectangle_filled_button.dart';
 import 'package:forms_app/shared/widgets/inputs/rectangle_text_form_field.dart';
@@ -49,8 +50,10 @@ class __RegisterFormState extends State<_RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    final registerState = context.watch<RegisterCubit>().state;
+    // final registerState = context.watch<RegisterCubit>().state;
     final registerCubit = context.read<RegisterCubit>();
+
+    ValidationBuilder.setLocale('es');
 
     return Form(
       key: _formKey,
@@ -62,15 +65,7 @@ class __RegisterFormState extends State<_RegisterForm> {
             hint: 'Ingrese su nombre de usuario',
             prefixIcon: Icons.person_outline,
             textCapitalization: TextCapitalization.words, // Capitalizar palabras
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Este campo es requerido';
-              }
-              if (value.length < 3) {
-                return 'El nombre de usuario debe tener al menos 3 caracteres';
-              }
-              return null;
-            },
+            validator: ValidationBuilder().minLength(3).maxLength(20).build(),
             onChanged: (value) => registerCubit.setUsername(value),
           ),
           const SizedBox(height: 10),
@@ -80,15 +75,7 @@ class __RegisterFormState extends State<_RegisterForm> {
             label: 'Correo',
             hint: 'Ingrese su correo',
             prefixIcon: Icons.email_outlined,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Este campo es requerido';
-              }
-              if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
-                return 'Ingrese un correo electrónico válido';
-              }
-              return null;
-            },
+            validator: ValidationBuilder().email().minLength(5).maxLength(50).build(),
             onChanged: (value) => registerCubit.setEmail(value),
           ),
           const SizedBox(height: 10),
@@ -99,15 +86,7 @@ class __RegisterFormState extends State<_RegisterForm> {
             hint: 'Ingrese su contraseña',
             prefixIcon: Icons.lock_outline,
             obscureText: true,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Este campo es requerido';
-              }
-              if (value.length < 6) {
-                return 'La contraseña debe tener al menos 6 caracteres';
-              }
-              return null;
-            },
+            validator: ValidationBuilder().minLength(6).build(),
             onChanged: (value) => registerCubit.setPassword(value),
           ),
           const SizedBox(height: 10),
