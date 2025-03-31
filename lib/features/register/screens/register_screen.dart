@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:forms_app/features/register/cubits/cubit/register_cubit.dart';
 import 'package:forms_app/shared/widgets/buttons/rectangle_filled_button.dart';
 import 'package:forms_app/shared/widgets/inputs/rectangle_text_form_field.dart';
 
@@ -7,23 +9,26 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Registrar usuario'),
-      ),
+    return BlocProvider(
+      create: (context) => RegisterCubit(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Registrar usuario'),
+        ),
 
-      /// Body
-      body: const SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(10),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FlutterLogo(size: 80),
-                SizedBox(height: 10),
-                _RegisterForm(),
-              ],
+        /// Body
+        body: const SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  FlutterLogo(size: 80),
+                  SizedBox(height: 10),
+                  _RegisterForm(),
+                ],
+              ),
             ),
           ),
         ),
@@ -41,14 +46,12 @@ class _RegisterForm extends StatefulWidget {
 
 class __RegisterFormState extends State<_RegisterForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final passwordController = TextEditingController();
-
-  String username = '';
-  String email = '';
-  String password = '';
 
   @override
   Widget build(BuildContext context) {
+    final registerState = context.watch<RegisterCubit>().state;
+    final registerCubit = context.read<RegisterCubit>();
+
     return Form(
       key: _formKey,
       child: Column(
@@ -68,7 +71,7 @@ class __RegisterFormState extends State<_RegisterForm> {
               }
               return null;
             },
-            onChanged: (value) => username = value,
+            onChanged: (value) => registerCubit.setUsername(value),
           ),
           const SizedBox(height: 10),
 
@@ -86,7 +89,7 @@ class __RegisterFormState extends State<_RegisterForm> {
               }
               return null;
             },
-            onChanged: (value) => email = value,
+            onChanged: (value) => registerCubit.setEmail(value),
           ),
           const SizedBox(height: 10),
 
@@ -105,7 +108,7 @@ class __RegisterFormState extends State<_RegisterForm> {
               }
               return null;
             },
-            onChanged: (value) => password = value,
+            onChanged: (value) => registerCubit.setPassword(value),
           ),
           const SizedBox(height: 10),
 
@@ -141,9 +144,7 @@ class __RegisterFormState extends State<_RegisterForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Usuario registrado')),
       );
-      print('Usuario: $username');
-      print('Correo: $email');
-      print('Contraseña: $password');
+      context.read<RegisterCubit>().onSubmit();
     }
   }
 }
